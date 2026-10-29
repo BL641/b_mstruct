@@ -1,0 +1,9 @@
+```text
+.vs/
+x64/
+Debug/
+Release/
+*.obj
+*.exe
+*.lib
+*.pdb
