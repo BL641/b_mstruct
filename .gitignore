@@ -1,9 +1,32 @@
-```text
+# Visual Studio build files and directories
 .vs/
 x64/
+x86/
 Debug/
 Release/
+
+# Object and executable files
 *.obj
 *.exe
 *.lib
 *.pdb
+*.ilk
+*.idb
+*.exp
+
+# Visual Studio project and solution user files (local settings)
+*.user
+*.suo
+
+# Visual Studio project files (если хочешь скрыть их из репозитория, оставь, если хочешь чтобы они были - удали эти строки)
+*.vcxproj
+*.vcxproj.filters
+*.sln
+
+# Precompiled Headers (мусор, который генерирует VS)
+pch.h
+pch.cpp
+framework.h
+
+# macOS / Linux (на всякий случай, если будешь делать на другой ОС)
+.DS_Store
