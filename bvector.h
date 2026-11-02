@@ -15,7 +15,8 @@ typedef struct { \
     size_t count; \
 } vector_##T; \
 \
-vector_##T* vector_##T##_init(size_t capacity) { \
+static inline vector_##T* vector_##T##_init(size_t capacity) { \
+    if (capacity == 0) return 0;\
     vector_##T* new_vect = (vector_##T*)malloc(sizeof(vector_##T)); \
     if (new_vect == NULL) return NULL; \
     \
@@ -30,12 +31,12 @@ vector_##T* vector_##T##_init(size_t capacity) { \
     return new_vect; \
 } \
 \
-size_t vector_##T##_size(vector_##T* vector){ \
+static inline size_t vector_##T##_size(vector_##T* vector){ \
     if (vector == NULL) return 0; \
     return vector->count;\
 } \
 \
-void v_##T##_resize(vector_##T* vector){\
+static inline void v_##T##_resize(vector_##T* vector){\
     if (vector == NULL){\
         return;   \
     }\
@@ -52,7 +53,7 @@ void v_##T##_resize(vector_##T* vector){\
     vector->data = new_data_ptr; \
 }\
 \
-void v_##T##_pback(vector_##T* vector, T data){ \
+static inline void v_##T##_pback(vector_##T* vector, T data){ \
     if (vector == NULL){ \
         return;\
     }\
@@ -66,18 +67,47 @@ void v_##T##_pback(vector_##T* vector, T data){ \
     vector->data[vector->count] = data; \
     (vector->count)++; \
 } \
-void v_##T##_pop(vector_##T* vector){\
+static inline void v_##T##_pop(vector_##T* vector){\
     if (vector == NULL){\
         return;\
     }\
     vector->count--;\
     vector->data[vector->count] = 0;\
 }\
-void v_free(vector_##T* vector){\
+\
+void v_##T##_copy(vector_##T* dist, vector_##T* source){\
+    if (dist == NULL || source == NULL) return;\
+    \
+    if (dist->capacity == 0){ \
+        dist->capacity = 1;\
+        dist->data = (T*)malloc(sizeof(T) * dist->capacity);\
+    }\
+    while (dist->capacity < source->count){\
+        v_##T##_resize(dist);\
+    }\
+    \
+    for (int i = 0; i < source->count; i++){\
+        *(dist->data + i) = *(source->data + i);\
+    }\
+    \
+    \
+    dist->count = source->count;\
+}\
+static inline void v_##T##_free(vector_##T* vector){\
     if (vector == NULL) return;\
     free(vector->data);\
     free(vector);\
     return;\
+}\
+static inline T v_##T##_at(const vector_##T* vector, size_t index){ \
+    if (vector == NULL || index >= vector->count) {\
+        return (T){0}; \
+    }\
+    return  vector->data[index];\
+}\
+static inline size_t vector_##T##_cap(const vector_##T* vector){\
+    if (vector == NULL) return -1;\
+    return vector->capacity;\
 }\
 \
 
