@@ -2,7 +2,6 @@
 #ifndef __BVECTOR__H
 #define __BVECTOR__H
 
-
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
