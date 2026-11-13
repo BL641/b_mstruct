@@ -15,6 +15,8 @@ int vec_push_core(vector* self, void* data); // пуш значения в ко�
 void* vec_at_core(vector* self, size_t idx); // взятие элемента
 void vec_popb_core(vector* self); // удаление элемента в конце
 void vec_free(vector* self); // освобождение памяти
+void* vec_begin_core(vector* self);
+void* vec_end_core(vector* self);
 
 // инициализация вектора 
 #define bvector(NAME, TYPE)\
@@ -33,9 +35,14 @@ static inline TYPE NAME##_at(vector* self, size_t idx){\
 	return *itcn;\
 }\
 static inline void NAME##_popb(vector* self){\
-	return vec_popb_core(self);\
+	vec_popb_core(self);\
 }\
-
+static inline TYPE* NAME##_beg(vector* self) {\
+    return (TYPE*)vec_begin_core(self);\
+}\
+static inline TYPE* NAME##_end(vector* self) {\
+    return (TYPE*)vec_end_core(self);\
+}
 
 
 #endif // !__BVECTOR__H
