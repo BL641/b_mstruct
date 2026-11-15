@@ -14,18 +14,38 @@ struct _vector {
 	size_t sizetype;
 };
 
-static inline void copy_data(void* dist, const void* source, size_t size) {
-	if (dist == NULL || source == NULL || size == 0) return;
+static inline void copy_data(void* dist, const void* source, size_t cpy_size) {
+	if (dist == NULL || source == NULL || cpy_size == 0) return;
 	
-	unsigned char* hptr_s = (unsigned char*)source;
-	unsigned char* hptr_d = (unsigned char*)dist;
+	size_t size = cpy_size;
 	
-	size_t cnt = 0;
-	while (cnt < size) {
-		*(hptr_d + cnt) = *(hptr_s + cnt);
-		cnt++;
+	uint8_t* d = (uint8_t*)dist;
+	const uint8_t* s = (uint8_t*)source;
+
+	while (size >= 8) {
+		*((uint64_t*)d) = *((uint64_t*)s);
+		d += 8; s += 8;
+		size -= 8;
 	}
-	
+
+	if (size >= 4) {
+		*((uint32_t*)d) = *((uint32_t*)s);
+		d += 4; s += 4;
+		size -= 4;
+	}
+
+	if (size >= 2) {
+		*((uint16_t*)d) = *((uint16_t*)s);
+		d += 2; s += 2;
+		size -= 2;
+	}
+
+	if (size >= 1) {
+		*((uint8_t*)d) = *((uint8_t*)s);
+		d += 1; s += 1;
+		size -= 1;
+	}
+
 	return;
 }
 
@@ -130,4 +150,76 @@ void vec_free(vector* self) {
 	free(self->data);
 	free(self);
 	return;
+}
+
+int vect_insert_core(vector *const self, size_t idx, const void *const data) {
+	if (self == NULL || self->data == NULL || data == NULL) {
+		return NULLERR;
+	}
+	if (idx > self->count) {
+		return SIZEERR;
+	}
+	
+	if (self->count >= self->capacity) {
+		int res = vec_resize_core(self);
+		if (res != 0) {
+			return res;
+		}
+	}
+
+	self->count++;
+
+	unsigned char* byte = ((unsigned char*)self->data);
+	for (size_t i = self->count - 1; i > idx; i--) {
+		copy_data(byte + (i * self->sizetype), byte + ((i - 1) * self->sizetype), self->sizetype);
+	}
+	copy_data(byte + (idx * self->sizetype), data, self->sizetype);
+
+	return 0;
+}
+
+int vect_erase_core(vector* const self, size_t idx) {
+	if (self == NULL || self->data == NULL) {
+		return NULLERR;
+	}
+	if (idx >= self->count) {
+		return SIZEERR;
+	}
+	
+	unsigned char* byte = ((unsigned char*)self->data);
+
+	for (size_t i = idx; i < self->count - 1; i++) {
+		copy_data(byte + (i * self->sizetype), byte + ((i + 1) * self->sizetype), self->sizetype);
+	}
+	
+	self->count--;
+
+	return 0;
+}
+
+void vec_clear_core(vector* const self) {
+	if (self == NULL) return;
+
+	self->count = 0;
+}
+
+int vec_reserve_core(vector* const self, size_t capacity) {
+	if (self == NULL || self->data == 0) return NULLERR;
+	if (self->capacity == 0 || self->sizetype == 0) return SIZEERR;
+	
+	void* new_data = malloc(self->sizetype * capacity);
+	if (new_data == NULL) return MEMERR;
+
+	copy_data(new_data, self->data, self->sizetype * self->count);
+
+	free(self->data);
+	self->data = new_data;
+	self->capacity = capacity;
+
+	return 0;
+}
+
+int vec_empty_core(const vector* const self) {
+	if (self == NULL || self->data == NULL) return 1;
+	return self->count == 0;
 }
