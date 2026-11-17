@@ -2,9 +2,10 @@
 #ifndef __BVECTOR__H
 #define __BVECTOR__H
 
-#include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+
+#include "butils.h"
 
 typedef struct _vector vector;
 
