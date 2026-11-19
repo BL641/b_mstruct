@@ -21,6 +21,8 @@ int array_empty_core(const array* const self); // проверка массив�
 void array_fill_core(array* const self, int value); // выдача элементам массива какого либо значения
 void array_zeroat_core(array* const self, size_t idx); // зануление определенного элемента
 int array_remove_core(array* const self, size_t idx); // удаление элемента
+void array_pop_core(array* const self); // удаление крайнего элемента с конца
+void array_free_core(array* self); // освобождение контейнера array
 
 #define barray(NAME, TYPE)\
 static inline array* NAME##_init(size_t capacity){\
@@ -61,5 +63,11 @@ static inline void NAME##_z_at(array* const self, size_t idx){\
 static inline int NAME##_remove(array* const self, size_t idx){\
 	return array_remove_core(self, idx);\
 }\
+static inline void NAME##_pop(array* const self){\
+	array_pop_core(self);\
+}\
+static inline void NAME##_free(array* self){\
+	array_free_core(self);\
+}
 
 #endif 

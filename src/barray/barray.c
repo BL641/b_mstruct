@@ -1,12 +1,6 @@
 
 #include "barray.h"
 
-typedef enum {
-	NULLERR = 1,
-	MEMERR = 2,
-	SIZEERR = 3
-} errors;
-
 struct _array {
 	void* data;
 	size_t sizetype;
@@ -119,9 +113,16 @@ int array_remove_core(array* const self, size_t idx) {
 
 	uint8_t* s = (uint8_t*)self->data;
 	
-	for (int i = idx; i < self->count - 1; i++) {
+	for (size_t i = idx; i < self->count - 1; i++) {
 		copy_data((s + (i * self->sizetype)), (s + ((i + 1) * self->sizetype)), self->sizetype);
  	}
 
 	self->count--;
+	return 0;
+}
+
+void array_free_core(array* self) {
+	if (self == NULL || self->data == NULL) return;
+	free(self->data);
+	free(self);
 }

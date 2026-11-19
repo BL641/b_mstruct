@@ -1,12 +1,6 @@
 
 #include "bvector.h"
 
-typedef enum {
-	NULLERR = 1,
-	MEMERR = 2,
-	SIZEERR = 3
-} errors;
-
 struct _vector {
 	void* data;
 	size_t count;
@@ -136,9 +130,9 @@ int vect_insert_core(vector *const self, size_t idx, const void *const data) {
 
 	unsigned char* byte = ((unsigned char*)self->data);
 	for (size_t i = self->count - 1; i > idx; i--) {
-		copy_data(byte + (i * self->sizetype), byte + ((i - 1) * self->sizetype), self->sizetype);
+		move_data(byte + (i * self->sizetype), byte + ((i - 1) * self->sizetype), self->sizetype);
 	}
-	copy_data(byte + (idx * self->sizetype), data, self->sizetype);
+	move_data(byte + (idx * self->sizetype), data, self->sizetype);
 
 	return 0;
 }
@@ -154,7 +148,7 @@ int vect_erase_core(vector* const self, size_t idx) {
 	unsigned char* byte = ((unsigned char*)self->data);
 
 	for (size_t i = idx; i < self->count - 1; i++) {
-		copy_data(byte + (i * self->sizetype), byte + ((i + 1) * self->sizetype), self->sizetype);
+		move_data(byte + (i * self->sizetype), byte + ((i + 1) * self->sizetype), self->sizetype);
 	}
 	
 	self->count--;
@@ -171,7 +165,8 @@ void vec_clear_core(vector* const self) {
 int vec_reserve_core(vector* const self, size_t capacity) {
 	if (self == NULL || self->data == 0) return NULLERR;
 	if (self->capacity == 0 || self->sizetype == 0) return SIZEERR;
-	
+	if (self->count > capacity) return SIZEERR;
+
 	void* new_data = malloc(self->sizetype * capacity);
 	if (new_data == NULL) return MEMERR;
 
